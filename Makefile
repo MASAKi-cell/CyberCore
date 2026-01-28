@@ -4,7 +4,7 @@
 # =============================================================================
 
 .PHONY: help install dev start build lint format typecheck clean \
-        build-mac build-win build-linux docker-build-linux docker-artifacts
+        build-mac build-win
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -56,23 +56,8 @@ build-mac: ## macOS用インストーラーをビルド
 build-win: ## Windows用インストーラーをビルド
 	npm run build:win
 
-build-linux: ## Linux用インストーラーをビルド（ホストOS）
-	npm run build:linux
-
 build-unpack: ## パッケージング前の展開ビルド
 	npm run build:unpack
-
-# -----------------------------------------------------------------------------
-# ビルド（Docker）
-# -----------------------------------------------------------------------------
-docker-build-linux: ## Linux用インストーラーをDockerでビルド
-	docker compose run --rm build-linux
-
-docker-artifacts: ## Dockerビルドの成果物を取得
-	docker compose run --rm artifacts
-
-docker-build: ## Dockerイメージをビルド
-	docker compose build
 
 # -----------------------------------------------------------------------------
 # クリーンアップ

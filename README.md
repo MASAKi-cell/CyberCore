@@ -11,7 +11,6 @@
 
 - Node.js 22+
 - npm 10+
-- Docker（Linuxビルド用、オプション）
 
 ## セットアップ
 
@@ -49,22 +48,13 @@ make dev
 | `make typecheck` | TypeScript 型チェック（全体）   |
 | `make check`     | lint + typecheck を実行         |
 
-### ビルド（ホストOS）
+### ビルド
 
-| コマンド           | 説明                             |
-| ------------------ | -------------------------------- |
-| `make build`       | アプリケーションをビルド         |
-| `make build-mac`   | macOS 用インストーラーをビルド   |
-| `make build-win`   | Windows 用インストーラーをビルド |
-| `make build-linux` | Linux 用インストーラーをビルド   |
-
-### ビルド（Docker）
-
-| コマンド                  | 説明                                     |
-| ------------------------- | ---------------------------------------- |
-| `make docker-build-linux` | Docker で Linux 用インストーラーをビルド |
-| `make docker-artifacts`   | Docker ビルドの成果物を取得              |
-| `make docker-build`       | Docker イメージをビルド                  |
+| コマンド         | 説明                             |
+| ---------------- | -------------------------------- |
+| `make build`     | アプリケーションをビルド         |
+| `make build-mac` | macOS 用インストーラーをビルド   |
+| `make build-win` | Windows 用インストーラーをビルド |
 
 ### クリーンアップ
 
@@ -72,17 +62,6 @@ make dev
 | ---------------- | ---------------------------------- |
 | `make clean`     | ビルド成果物を削除                 |
 | `make clean-all` | ビルド成果物と node_modules を削除 |
-
-## Docker でのビルド
-
-macOS/Windows 環境から Linux インストーラーをビルドする場合に使用します。
-
-```bash
-# Linux インストーラーをビルド
-make docker-build-linux
-
-# 成果物は ./dist に出力されます
-```
 
 ## プロジェクト構造
 
