@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "analyzing-browser-forensics-with-hindsight": {
+      "source": "mukul975/Anthropic-Cybersecurity-Skills",
+      "sourceType": "github",
+      "computedHash": "4942a8aac8237fd08afb366a354812f676b6a832d255610d3c9125f8e09a8780"
+    }
+  }
+}
