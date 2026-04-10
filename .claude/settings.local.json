@@ -9,12 +9,17 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(npm run test:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(rustc --version)",
+      "Bash(cargo --version)",
+      "Bash(cp -r src/renderer/src/assets src/assets)",
+      "Bash(cp src/renderer/src/env.d.ts src/env.d.ts)",
+      "Bash(mkdir -p src/components)"
     ],
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm -rf:*)",
-      "Read(.env:*)",
+      "Read(.env*)",
       "Read(**/*token*)",
       "Read(**/*key*)"
     ]

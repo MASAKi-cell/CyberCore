@@ -1,10 +1,6 @@
-# CLAUDE.md
-
-このファイルは、Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンスを提供します。
-
 ## プロジェクト概要
 
-CyberCoreは、electron-viteをビルドツールとして使用し、ReactとTypeScriptで構築されたElectronデスクトップアプリケーションです。
+CyberCoreは、TauriをバックエンドとしてReactとTypeScriptで構築されたデスクトップアプリケーションです。フロントエンドはVite、バックエンドはRustで実装されています。
 
 ## 開発コマンド
 
@@ -13,67 +9,65 @@ CyberCoreは、electron-viteをビルドツールとして使用し、ReactとTy
 npm install
 
 # ホットリロード付き開発サーバー起動
-npm run dev
+npm run tauri dev
 
 # 型チェック
-npm run typecheck          # 全体の型チェック（node + web）
-npm run typecheck:node     # main/preloadプロセスのみ
-npm run typecheck:web      # rendererプロセスのみ
+npm run typecheck
 
 # リント・フォーマット
-npm run lint               # ESLint（キャッシュ有効）
-npm run format             # Prettierフォーマット
+npm run lint
+npm run format
 
 # アプリケーションビルド
-npm run build              # 型チェック + ビルド
-
-# プラットフォーム別インストーラー作成
-npm run build:mac          # macOS DMG
-npm run build:win          # Windows NSISインストーラー
-npm run build:linux        # Linux AppImage/snap/deb
+npm run tauri build
 ```
 
 ## アーキテクチャ
 
-標準的なElectronマルチプロセスアーキテクチャで、3つの異なるコンテキストがあります。
+### フロントエンド (`src/`)
 
-### Mainプロセス (`src/main/`)
-- `index.ts`で実行されるNode.js環境
-- アプリケーションのライフサイクル、ウィンドウ作成、ネイティブOS操作を管理
-- `ipcMain.on()`と`ipcMain.handle()`でrendererからのIPCメッセージを処理
-
-### Preloadプロセス (`src/preload/`)
-- コンテキスト分離によるmainとrendererの橋渡し
-- `contextBridge.exposeInMainWorld()`で安全なAPIをrendererに公開
-- `window.electron`と`window.api`オブジェクトはここで定義
-
-### Rendererプロセス (`src/renderer/src/`)
-- ブラウザコンテキストで実行されるReact 19アプリケーション
+- Vite + React 19 + TypeScript
 - エントリーポイント: `main.tsx` → `App.tsx`
-- `window.electron.ipcRenderer`を通じてmainプロセスと通信
-- パスエイリアス`@renderer`は`src/renderer/src`にマップ
+- `@tauri-apps/api` を使ってバックエンドと通信
+
+### バックエンド (`src-tauri/`)
+
+- Rust製のネイティブバックエンド
+- `#[tauri::command]` でフロントエンドから呼び出せる関数を定義
+- `src-tauri/src/main.rs` または `lib.rs` がエントリーポイント
+- `src-tauri/tauri.conf.json` でウィンドウ設定・権限を管理
 
 ## IPC通信パターン
 
 ```typescript
-// Mainプロセス (src/main/index.ts)
-ipcMain.on('channel-name', (event, ...args) => { /* 処理 */ })
-ipcMain.handle('channel-name', async (event, ...args) => { /* 値を返す */ })
+// フロントエンド (src/)
+import { invoke } from '@tauri-apps/api/core'
 
-// Rendererプロセス (preloadブリッジ経由)
-window.electron.ipcRenderer.send('channel-name', data)
-window.electron.ipcRenderer.invoke('channel-name', data)
+const result = await invoke<string>('command_name', { arg: value })
+```
+
+```rust
+// バックエンド (src-tauri/src/)
+#[tauri::command]
+fn command_name(arg: String) -> String {
+    // 処理
+    arg
+}
+
+// main.rs でコマンドを登録
+tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![command_name])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
 ```
 
 ## TypeScript設定
 
-プロジェクトはコンポジットTypeScript設定を使用:
-- `tsconfig.node.json` - MainとPreloadプロセス（Node.js API）
-- `tsconfig.web.json` - Rendererプロセス（DOM/React API）
-- `tsconfig.json` - 両方を参照するルート設定
+- `tsconfig.json` - 単一設定（DOM/React API）
 
 ## コードスタイル
 
 - Prettier: シングルクォート、セミコロンなし、100文字幅、末尾カンマなし
-- ESLint: Electron toolkit設定 + React/hooksプラグイン
+- ESLint: typescript-eslint + React/hooksプラグイン
 - 2スペースインデント（.editorconfigで定義）
+- Rust: `cargo fmt` でフォーマット、`cargo clippy` でlint

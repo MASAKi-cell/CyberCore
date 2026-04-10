@@ -3,8 +3,8 @@
 # ヘルプ:   make help
 # =============================================================================
 
-.PHONY: help install dev start build lint format typecheck clean \
-        build-mac build-win
+.PHONY: help install dev build preview lint format typecheck check \
+        build-mac build-win build-linux clean clean-all
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -19,10 +19,10 @@ help: ## ヘルプを表示
 # 開発
 # -----------------------------------------------------------------------------
 dev: ## 開発サーバーを起動（ホットリロード）
-	npm run dev
+	npm run tauri dev
 
-start: ## ビルド済みアプリをプレビュー
-	npm run start
+preview: ## フロントエンドのプレビューサーバーを起動
+	npm run preview
 
 # -----------------------------------------------------------------------------
 # コード品質
@@ -33,37 +33,31 @@ lint: ## ESLintでコードをチェック
 format: ## Prettierでコードをフォーマット
 	npm run format
 
-typecheck: ## TypeScript型チェック（全体）
+typecheck: ## TypeScript型チェック
 	npm run typecheck
-
-typecheck-node: ## TypeScript型チェック（main/preload）
-	npm run typecheck:node
-
-typecheck-web: ## TypeScript型チェック（renderer）
-	npm run typecheck:web
 
 check: lint typecheck ## lint + typecheck を実行
 
 # -----------------------------------------------------------------------------
-# ビルド（ホストOS）
+# ビルド
 # -----------------------------------------------------------------------------
-build: ## アプリケーションをビルド
-	npm run build
+build: ## アプリケーションをビルド（全プラットフォーム）
+	npm run tauri build
 
 build-mac: ## macOS用インストーラーをビルド
-	npm run build:mac
+	npm run tauri build -- --target universal-apple-darwin
 
 build-win: ## Windows用インストーラーをビルド
-	npm run build:win
+	npm run tauri build -- --target x86_64-pc-windows-msvc
 
-build-unpack: ## パッケージング前の展開ビルド
-	npm run build:unpack
+build-linux: ## Linux用パッケージをビルド
+	npm run tauri build -- --target x86_64-unknown-linux-gnu
 
 # -----------------------------------------------------------------------------
 # クリーンアップ
 # -----------------------------------------------------------------------------
 clean: ## ビルド成果物を削除
-	rm -rf dist out .eslintcache
+	rm -rf dist src-tauri/target .eslintcache
 
 clean-all: clean ## ビルド成果物とnode_modulesを削除
 	rm -rf node_modules
